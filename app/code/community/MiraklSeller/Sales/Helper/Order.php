@@ -1,5 +1,4 @@
 <?php
-
 use Mirakl\MMP\Common\Domain\Order\OrderState;
 use Mirakl\MMP\Common\Domain\Order\ShopOrderLine;
 use Mirakl\MMP\Common\Domain\Order\State\OrderStatus;
@@ -40,8 +39,14 @@ class MiraklSeller_Sales_Helper_Order extends Mage_Core_Helper_Abstract
         $order = Mage::getModel('mirakl_seller_sales/create_order')->create($miraklOrder, $store);
 
         $config = Mage::helper('mirakl_seller_sales/config');
-
-        if ($config->isAutoCreateInvoice() && $miraklOrder->getPaymentWorkflow() == 'PAY_ON_ACCEPTANCE') {
+    
+        /**
+         * Modified to always create an invoice
+         * @author Elias Erckens-Platsch
+         * @version 1.2.3
+         */
+//      if ($config->isAutoCreateInvoice() && $miraklOrder->getPaymentWorkflow() == 'PAY_ON_ACCEPTANCE') {
+        if ($config->isAutoCreateInvoice()) {
             Mage::getModel('mirakl_seller_sales/create_invoice')->create($order);
         }
 
@@ -50,19 +55,6 @@ class MiraklSeller_Sales_Helper_Order extends Mage_Core_Helper_Abstract
         }
 
         return $order;
-    }
-
-    /**
-     * @param   string|null $locale
-     * @return  array
-     */
-    public function getCountryList($locale = null)
-    {
-        if (null === $locale) {
-            $locale = Mage::app()->getLocale()->getLocale();
-        }
-
-        return \Zend_Locale::getTranslationList('territory', $locale, 2);
     }
 
     /**
