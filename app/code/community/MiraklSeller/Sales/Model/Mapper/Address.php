@@ -8,26 +8,24 @@ class MiraklSeller_Sales_Model_Mapper_Address implements MiraklSeller_Sales_Mode
     public function map(array $data, $locale = null)
     {
         $countryId = $this->_getCountryResolver()->resolve($data, $locale);
-
-        $phone = $data['phone'];
+        
+        $phone = isset($data['phone']) ? $data['phone'] : null;
         if (!$phone && !empty($data['phone_secondary'])) {
             $phone = $data['phone_secondary'];
         }
-
-        $result = array(
+        
+        return array(
             'firstname'  => $data['firstname'],
             'lastname'   => $data['lastname'],
-            'street'     => trim($data['street_1'] . "\n" . $data['street_2']),
+            'street'     => trim($data['street_1'] . (isset($data['street_2']) ? "\n" . $data['street_2'] : '')),
             'telephone'  => $phone,
             'postcode'   => $data['zip_code'],
             'city'       => $data['city'],
             'country_id' => $countryId ?: '',
             'country'    => $data['country'],
         );
-
-        return $result;
     }
-
+    
     /**
      * @return  MiraklSeller_Sales_Model_Address_Country_Resolver
      */
