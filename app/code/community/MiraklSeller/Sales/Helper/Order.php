@@ -254,4 +254,30 @@ class MiraklSeller_Sales_Helper_Order extends Mage_Core_Helper_Abstract
             )
         );
     }
+    
+    /**
+     * Returns true if the given Magento order has a shipment tracking number.
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @return bool
+     */
+    public function hasOrderShipmentTracking($order)
+    {
+        return !empty($order->getTracksCollection());
+    }
+    
+    /**
+     * Returns true if the given Mirakl order has a shipment tracking number.
+     *
+     * @param ShopOrder $miraklOrder
+     * @return bool
+     */
+    public function hasMiraklOrderShipmentTracking($miraklOrder)
+    {
+        if ($this->isMiraklOrderShipped($miraklOrder)) {
+            return (bool) $miraklOrder->getShipping()->getTrackingNumber();
+        }
+        
+        return false;
+    }
 }
