@@ -30,18 +30,12 @@ class MiraklSeller_Sales_Model_Synchronize_Order
      * @var MiraklSeller_Sales_Model_Synchronize_Refunds
      */
     protected $_synchronizeRefunds;
-    
-    /**
-     * @var MiraklSeller_Sales_Model_Synchronize_Shipment
-     */
-    protected $_synchronizeShipment;
 
     public function __construct()
     {
         $this->_createInvoice       = Mage::getModel('mirakl_seller_sales/create_invoice');
         $this->_createShipment      = Mage::getModel('mirakl_seller_sales/create_shipment');
         $this->_synchronizeRefunds  = Mage::getModel('mirakl_seller_sales/synchronize_refunds');
-        $this->_synchronizeShipment = Mage::getModel('mirakl_seller_sales/synchronize_shipment');
         $this->_config              = Mage::helper('mirakl_seller_sales/config');
         $this->_orderHelper         = Mage::helper('mirakl_seller_sales/order');
     }
@@ -86,13 +80,6 @@ class MiraklSeller_Sales_Model_Synchronize_Order
         if ($canShip && $this->_orderHelper->isMiraklOrderShipped($miraklOrder)) {
             $updated = true;
             $this->_createShipment->create($magentoOrder, $miraklOrder);
-        }
-        
-        // Push shipment tracking number to Mirakl if Magento order has tracked shipment and Mirakl order has not.
-        if ($this->_orderHelper->hasOrderShipmentTracking($magentoOrder)
-            && !$this->_orderHelper->hasMiraklOrderShipmentTracking($miraklOrder)) {
-            $updated = true;
-            $this->_synchronizeShipment->pushTrackingInfo($magentoOrder, $miraklOrder);
         }
 
         // Synchronize Mirakl refunds with Magento order
