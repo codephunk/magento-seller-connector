@@ -1,4 +1,5 @@
 .idea/
+htdocs/
 .DS_Store
 bin/
 composer.lock
