@@ -98,6 +98,7 @@ abstract class MiraklSeller_Sales_Model_Observer_Abstract
      */
     protected function _getMiraklOrder(Connection $connection, $miraklOrderId)
     {
+        if (Mage::registry('mirakl_order')) return Mage::registry('mirakl_order');
         $miraklOrder = $this->_apiOrder->getOrderById($connection, $miraklOrderId);
 
         if (!$miraklOrder) {
