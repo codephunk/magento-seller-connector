@@ -52,15 +52,15 @@
                     </mirakl_seller_sales>
                 </observers>
             </mirakl_api_connection_delete_before>
-            <sales_order_shipment_track_save_after>
+            <codephunk_xport_shipping_import_after>
                 <observers>
                     <mirakl_seller_sales>
                         <type>singleton</type>
                         <class>mirakl_seller_sales/observer_shipment</class>
-                        <method>onSaveShipmentTrackingAfter</method>
+                        <method>onShipmentDataImportAfter</method>
                     </mirakl_seller_sales>
                 </observers>
-            </sales_order_shipment_track_save_after>
+            </codephunk_xport_shipping_import_after>
         </events>
     </global>
     <adminhtml>
