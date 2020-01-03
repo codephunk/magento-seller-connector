@@ -92,10 +92,16 @@ class MiraklSeller_Sales_Model_Observer_Shipment extends MiraklSeller_Sales_Mode
 //            $this->_getSession()->addError($this->__('An error occurred: %s', $e->getMessage()));
 //        }
 //    }
-    
+    /**
+     * @event codephunk_xport_shipping_import_after
+     * @param Varien_Event_Observer $observer
+     * @return $this
+     */
     public function onShipmentDataImportAfter(Varien_Event_Observer $observer)
     {
+        Mage::log('onShipmentDataImportAfter observer event called');
         $orderIds = $observer->getEvent()->getUpdatedOrders();
+        Mage::log(array('$orderIds' => $orderIds));
         if (empty($orderIds)) return $this;
     
         /** @var Mage_Sales_Model_Resource_Order_Collection $orderCollection */
