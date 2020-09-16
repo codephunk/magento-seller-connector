@@ -50,7 +50,6 @@ class MiraklSeller_Core_Model_Autoload
     {
         if (!self::$_registered) {
             self::$_registered = true;
-            Mage::log($this->getPackagesDir());
             if (!is_dir($this->getPackagesDir() . DS . 'composer')) {
                 Mage::throwException('Could not find Mirakl SDK library. Please verify your Mirakl Connector installation.');
             }
