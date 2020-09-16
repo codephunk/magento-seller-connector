@@ -6,3 +6,4 @@ docker/
 docker-compose.yml.dist
 Jenkinsfile
 phpunit.xml
+/htdocs/
