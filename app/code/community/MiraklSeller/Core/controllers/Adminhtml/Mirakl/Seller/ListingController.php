@@ -20,8 +20,7 @@ class MiraklSeller_Core_Adminhtml_Mirakl_Seller_ListingController extends Mage_A
         if ($mustExists && !$listing->getId()) {
             $this->_getSession()->addError($this->__('This listing no longer exists.'));
             $this->_redirect('*/*/');
-            $this->getResponse()->sendResponse();
-            exit; // @codingStandardsIgnoreLine
+            $this->getResponse()->sendHeadersAndExit();
         }
 
         return $listing;
@@ -116,7 +115,8 @@ class MiraklSeller_Core_Adminhtml_Mirakl_Seller_ListingController extends Mage_A
 
             session_write_close();
 
-            echo $contents; // @codingStandardsIgnoreLine
+            $this->getResponse()->setBody($contents);
+            $this->getResponse()->outputBody();
         } catch (Exception $e) {
             $this->_getSession()->addError($e->getMessage());
 
@@ -129,7 +129,8 @@ class MiraklSeller_Core_Adminhtml_Mirakl_Seller_ListingController extends Mage_A
      */
     public function editAction()
     {
-        $listing = $this->_getListing();
+        $mustExists = $this->getRequest()->has('id');
+        $listing = $this->_getListing($mustExists);
 
         $data = $this->_getSession()->getFormData(true);
         if (!empty($data)) {
@@ -204,27 +205,6 @@ class MiraklSeller_Core_Adminhtml_Mirakl_Seller_ListingController extends Mage_A
                         'Click <a href="%s">here</a> to view process output.', $url
                     )
                 );
-        } catch (Exception $e) {
-            Mage::logException($e);
-            $this->_getSession()->addError($e->getMessage());
-        }
-
-        return $this->_redirectReferer();
-    }
-
-    /**
-     * Remove multiple offers from listing at once
-     */
-    public function massDeleteOfferAction()
-    {
-        $listing = $this->_getListing(true);
-        $productIds = $this->getRequest()->getParam('products');
-
-        try {
-            Mage::getResourceModel('mirakl_seller/offer')
-                ->markOffersAsDelete($listing->getId(), $productIds);
-
-            $this->_getSession()->addSuccess($this->__('Selected prices & stocks will be deleted during the next export.'));
         } catch (Exception $e) {
             Mage::logException($e);
             $this->_getSession()->addError($e->getMessage());
