@@ -25,12 +25,12 @@ class MiraklSeller_Core_Model_Autoload
             array(
                 'candidates' => array(
                     BP . DS . 'vendor',
+                    BP . DS . '..'. DS . 'vendor',
                     BP . DS . 'includes' . DS . 'mirakl',
                     BP . DS . 'lib' . DS . 'mirakl',
                 ),
             )
         );
-
         Mage::dispatchEvent('mirakl_seller_packages_dir_candidates', array('candidates' => $candidates));
 
         foreach ($candidates->getData('candidates') as $dir) {
@@ -50,7 +50,7 @@ class MiraklSeller_Core_Model_Autoload
     {
         if (!self::$_registered) {
             self::$_registered = true;
-
+            Mage::log($this->getPackagesDir());
             if (!is_dir($this->getPackagesDir() . DS . 'composer')) {
                 Mage::throwException('Could not find Mirakl SDK library. Please verify your Mirakl Connector installation.');
             }
