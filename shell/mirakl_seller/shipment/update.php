@@ -28,37 +28,39 @@ class MiraklSeller_Shell_Shipment_Update extends Mage_Shell_Abstract
     
         return $this;
     }
-
+    
     /**
      * @param   string  $str
      */
     protected function _echo($str)
     {
         if (!$this->_quiet) {
-            echo $str . PHP_EOL; // @codingStandardsIgnoreLine
+            printf('%s%s', $str, PHP_EOL);
         }
     }
-
+    
     /**
      * @param   string  $str
      */
     protected function _fault($str)
     {
-        $this->_echo($str);
-        exit; // @codingStandardsIgnoreLine
+        throw new \Exception($str);
     }
 
     /**
      * @param   int $listingId
      * @return  $this
      */
-    protected function _updateAllShipments()
+    protected function _updateAllShipments($sinceDays)
     {
+        $_sinceDays = abs((int) $sinceDays);
+        
         /** @var Mage_Sales_Model_Resource_Order_Collection $orderCollection */
         $orderCollection = Mage::getResourceModel('sales/order_collection');
         $orderCollection
             ->addFieldToFilter('status', 'complete')
-            ->addFieldToFilter('mirakl_order_id', array('notnull' => true));
+            ->addFieldToFilter('mirakl_order_id', array('notnull' => true))
+            ->addFieldToFilter('created_at', array('gt' => date("Y-m-d H:i:s", strtotime("-{$_sinceDays} day"))));
         $connections = array();
         /** @var Mage_Sales_Model_Order $order */
         foreach($orderCollection as $order) {
@@ -100,9 +102,9 @@ class MiraklSeller_Shell_Shipment_Update extends Mage_Shell_Abstract
      */
     public function run()
     {
-        if ($listing = $this->getArg('all')) {
+        if ($sinceDays = $this->getArg('all')) {
             try {
-                $this->_updateAllShipments();
+                $this->_updateAllShipments($sinceDays);
             } catch (Exception $e) {
                 $this->_fault('An exception has been thrown: ' . $e->getMessage());
             }
@@ -117,11 +119,11 @@ class MiraklSeller_Shell_Shipment_Update extends Mage_Shell_Abstract
     public function usageHelp()
     {
         return <<<USAGE
-This script will update all shipment tracking numbers of the specified listing.
+This script will update all shipment tracking numbers of all mirakl orders since a specific number of days.
 
-Usage: php -f {$_SERVER['SCRIPT_NAME']} -- --listing <listing_id> [options]
+Usage: php -f {$_SERVER['SCRIPT_NAME']} -- --all <since_days> [options]
 
-  --listing <listing_id>        Identifier of the listing
+  --all <since_days>            Number of days
   --quiet                       Shutdown standard output messages
   --help                        This help
 
