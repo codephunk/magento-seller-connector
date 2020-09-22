@@ -1,8 +1,8 @@
 {
     "name": "codephunk/magento-seller-connector",
-    "description": "Forked Official Magento 1 Connector for the Mirakl Marketplace Platform.",
+    "description": "Fork of the official Magento 1 Connector for Mirakl Marketplaces.",
     "type": "magento-module",
-    "version": "1.2.4",
+    "version": "1.2.6.2",
     "license": "proprietary",
     "require": {
         "mirakl/sdk-php-shop": "~1.9",
