@@ -86,7 +86,60 @@ class MiraklSeller_Sales_Model_Observer_Shipment extends MiraklSeller_Sales_Mode
             $this->_getSession()->addError($this->__('An error occurred: %s', $e->getMessage()));
         }
     }
-
+    
+    /**
+     * Custom observer to handle shipping data imports by the CodePhunk_XPort module.
+     *
+     * @event codephunk_xport_shipping_import_after
+     * @param Varien_Event_Observer $observer
+     * @return $this
+     */
+    public function onShipmentDataImportAfter(Varien_Event_Observer $observer)
+    {
+        $orderIds = $observer->getEvent()->getUpdatedOrders();
+        if (empty($orderIds)) return $this;
+        
+        /** @var Mage_Sales_Model_Resource_Order_Collection $orderCollection */
+        $orderCollection = Mage::getResourceModel('sales/order_collection');
+        $orderCollection
+            ->addFieldToFilter('entity_id', array('in' => $orderIds))
+            ->addFieldToFilter('mirakl_order_id', array('notnull' => true));
+        $connections = array();
+        /** @var Mage_Sales_Model_Order $order */
+        foreach($orderCollection as $order) {
+            $connectionId = $order->getMiraklConnectionId();
+            $miraklOrderId = $order->getMiraklOrderId();
+            if (!$connectionId) continue;
+            if (!isset($connections[$connectionId])) {
+                $connections[$connectionId] = Mage::getModel('mirakl_seller_api/connection')->load($connectionId);
+            }
+            $miraklOrder = $this->_apiOrder->getOrderById($connections[$connectionId], $miraklOrderId);
+            $this->_echo('loaded Mirakl order ' . $miraklOrderId . ' with state ' . $miraklOrder->getStatus()->getState());
+            if ($miraklOrder->getStatus()->getState() !== OrderState::SHIPPING) {
+                $this->_echo('skipping.');
+            } else {
+                $this->_echo('processing...');
+                $tracks = $order->getTracksCollection()->getFirstItem();
+                if ($tracks) {
+                    $trackingId = $tracks->getNumber();
+                    $this->_apiOrder->updateOrderTrackingInfo(
+                        $connections[$connectionId],
+                        $miraklOrder->getId(),
+                        'dhl-de', // TODO: needs to be configurable
+                        'DHL-DE', // TODO: needs to be configurable
+                        $trackingId
+                    );
+                    // Confirm shipment of the order in Mirakl
+                    $this->_apiOrder->shipOrder($connections[$connectionId], $miraklOrder->getId());
+                    $this->_echo('done...');
+                } else {
+                    $this->_echo('no tracking number found...');
+                }
+            }
+        }
+    }
+    
+    
     /**
      * Returns order total quantity to ship
      *

@@ -52,6 +52,7 @@
                     </mirakl_seller_sales>
                 </observers>
             </mirakl_api_connection_delete_before>
+            <!-- ### Observer for CodePhunk_XPort shipment tracking imports -->
             <codephunk_xport_shipping_import_after>
                 <observers>
                     <mirakl_seller_sales>
@@ -61,6 +62,7 @@
                     </mirakl_seller_sales>
                 </observers>
             </codephunk_xport_shipping_import_after>
+            <!-- ### -->
         </events>
     </global>
     <adminhtml>
